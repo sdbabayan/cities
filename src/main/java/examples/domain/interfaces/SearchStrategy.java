@@ -5,5 +5,5 @@ import java.util.Comparator;
 
 public interface SearchStrategy<T> {
 
-    int search(ArrayList<T> list, T object, Comparator<? super T> comparator);
+    boolean search(ArrayList<T> list, T object, Comparator<? super T> comparator);
 }
