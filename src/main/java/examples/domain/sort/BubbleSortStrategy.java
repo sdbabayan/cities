@@ -1,7 +1,8 @@
 package examples.domain.sort;
 
-import examples.MyArrayList;
-import examples.SortStrategy;
+
+import examples.data.repository.MyArrayList;
+import examples.domain.interfaces.SortStrategy;
 
 import java.util.Comparator;
 
