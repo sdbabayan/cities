@@ -1,4 +1,4 @@
-package examples.data.model;
+package data.model;
 
 public class City {
     private String cityName;

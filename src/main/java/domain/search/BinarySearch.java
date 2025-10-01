@@ -1,8 +1,8 @@
-package examples.domain.search;
+package domain.search;
 
-import examples.data.repository.ArrayListToSortByStrategy;
-import examples.domain.interfaces.SearchStrategy;
-import java.util.ArrayList;
+import data.repository.ArrayListToSortByStrategy;
+import domain.interfaces.SearchStrategy;
+
 import java.util.Comparator;
 
 public class BinarySearch<T> implements SearchStrategy<T> {

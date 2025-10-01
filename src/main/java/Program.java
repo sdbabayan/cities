@@ -1,9 +1,7 @@
-package examples;
-
-import examples.data.model.City;
-import examples.data.model.HistoricalDate;
-import examples.data.model.Location;
-import examples.data.model.LocationException;
+import data.model.City;
+import data.model.HistoricalDate;
+import data.model.Location;
+import data.model.LocationException;
 
 class Program {
     public static void main(String[] args) {

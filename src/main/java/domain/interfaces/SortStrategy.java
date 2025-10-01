@@ -1,7 +1,7 @@
-package examples.domain.interfaces;
+package domain.interfaces;
 
 
-import examples.data.repository.ArrayListToSortByStrategy;
+import data.repository.ArrayListToSortByStrategy;
 
 import java.util.Comparator;
 

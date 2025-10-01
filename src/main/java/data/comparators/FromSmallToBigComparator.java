@@ -1,4 +1,4 @@
-package examples.data.comparators;
+package data.comparators;
 
 import java.util.Comparator;
 

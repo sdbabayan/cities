@@ -1,11 +1,10 @@
-package examples.data.repository;
+package data.repository;
 
-import examples.domain.interfaces.SortStrategy;
+import domain.interfaces.SortStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 
 public class ArrayListToSortByStrategy<T> extends ArrayList<T> {
     public ArrayListToSortByStrategy() {
