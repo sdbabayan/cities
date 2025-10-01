@@ -299,12 +299,16 @@ public class Program {
         System.out.println("\nВыберите алгоритм сортировки:");
         System.out.println("1 - Сортировка пузырьком (Bubble Sort)");
         System.out.println("2 - Быстрая сортировка (Quick Sort)");
+        System.out.println("3 - Сортировка слиянием (Merge Sort)");
+
         String type = scanner.nextLine();
         switch (type) {
             case "1":
                 return new BubbleSortStrategy();
             case "2":
                 return new QuickSortStrategy();
+            case "3":
+                //return new MergeSortStrategy();
             default:
                 System.out.println("Неверный выбор.");
                 return null;
@@ -316,7 +320,8 @@ public class Program {
         System.out.println("1 - Бинарный поиск (Binary Search)");
         String type = scanner.nextLine();
         switch (type) {
-            case "1": return new BinarySearchStrategy();
+            case "1":
+                return new BinarySearchStrategy();
             default:
                 System.out.println("Неверный выбор.");
                 return null;
