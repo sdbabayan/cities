@@ -1,17 +1,26 @@
 package ui;
 
+import data.comparators.*;
+import data.model.Animal;
+import data.model.City;
+import data.model.Person;
+import data.repository.ArrayListToSortByStrategy;
+import domain.interfaces.SearchStrategy;
+import domain.interfaces.SortStrategy;
+import domain.search.BinarySearchStrategy;
+import domain.sort.BubbleSortStrategy;
+import domain.sort.QuickSortStrategy;
+
 import java.util.Comparator;
-import java.util.List;
 import java.util.Scanner;
 
 public class Program {
-    private static List<?> collection = null;
-    private static String currentType = null; // выбранный класс
-    private static Class<?> clazz = null; // выбранный класс
+    private static ArrayListToSortByStrategy<?> collection = null;
+    private static String currentType = null;
     private static SortStrategy sortStrategy = null;
     private static SearchStrategy searchStrategy = null;
     private static Comparator<?> comparator = null;
-    private static boolean isSorted = false;  // для бинарного поиска
+    private static boolean isSorted = false;
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -61,44 +70,44 @@ public class Program {
                 case "1":
                     System.out.print("Введите путь к файлу: ");
                     String path = scanner.nextLine();
+
                     currentType = chooseType(scanner);
                     if (currentType == null) break;
 
                     switch (currentType) {
                         case "City":
-                            System.out.println("вызван метод City.loadDataFromFile(" + path + ")");
-                            //collection = City.loadDataFromFile(path);
+                            collection = City.loadDataFromFile(path);
                             break;
                         case "Person":
-                            System.out.println("вызван метод Person.loadDataFromFile(" + path + ")");
-                            //collection = Person.loadDataFromFile(path);
+                            collection = Person.loadDataFromFile(path);
                             break;
                         case "Animal":
-                            System.out.println("вызван метод Animal.loadDataFromFile(" + path + ")");
-                            //collection = Animal.loadDataFromFile(path);
+                            collection = Animal.loadDataFromFile(path);
                             break;
                     }
+                    collection.forEach(System.out::println);
                     isSorted = false;
                     break;
 
                 case "2":
-                    System.out.print("Введите количество элементов: ");
-                    int qty = Integer.parseInt(scanner.nextLine());
                     currentType = chooseType(scanner);
                     if (currentType == null) break;
 
+                    System.out.print("Введите количество элементов: ");
+                    int qty = Integer.parseInt(scanner.nextLine());
+
                     switch (currentType) {
                         case "City":
-                            System.out.println("вызван метод City.loadRandomData(" + qty + ")");
-                            //collection = City.loadRandomData(qty);
+                            collection = City.loadRandomData(qty);
                             break;
-                        case "Person": System.out.println("вызван метод Person.loadRandomData(" + qty + ")");
-                            //collection = Person.loadRandomData(qty);
+                        case "Person":
+                            collection = Person.loadRandomData(qty);
                             break;
-                        case "Animal": System.out.println("вызван метод Animal.loadRandomData(" + qty + ")");
-                            //collection = Animal.loadRandomData(qty);
+                        case "Animal":
+                            collection = Animal.loadRandomData(qty);
                             break;
                     }
+                    collection.forEach(System.out::println);
                     isSorted = false;
                     break;
 
@@ -107,16 +116,17 @@ public class Program {
                     if (currentType == null) break;
 
                     switch (currentType) {
-                        case "City": System.out.println("вызван метод City.loadDataManually()");
-                            //collection = City.loadDataManually();
+                        case "City":
+                            collection = City.loadDataManually(scanner);
                             break;
-                        case "Person": System.out.println("вызван метод Person.loadDataManually()");
-                            //collection = Person.loadDataManually();
+                        case "Person":
+                            collection = Person.loadDataManually();
                             break;
-                        case "Animal": System.out.println("вызван метод Animal.loadDataManually()");
-                            //collection = Animal.loadDataManually();
+                        case "Animal":
+                            collection = Animal.loadDataManually();
                             break;
                     }
+                    collection.forEach(System.out::println);
                     isSorted = false;
                     break;
 
@@ -163,15 +173,31 @@ public class Program {
                         System.out.println("2 - С запада на восток");
                         System.out.println("3 - По названию");
                         System.out.println("4 - По дате основания");
+                        System.out.println("5 - По удаленности от города");
                         String sortCriterion = scanner.nextLine();
                         if ("1".equals(sortCriterion)) {
                             comparator = new CityLatitudeComparator();
                         } else if ("2".equals(sortCriterion)) {
-                            comparator = new CitylongitudeComparator();
+                            comparator = new CityLongitudeComparator();
                         } else if ("3".equals(sortCriterion)) {
                             comparator = new CityNameComparator();
                         } else if ("4".equals(sortCriterion)) {
                             comparator = new CityFoundationDateComparator();
+                        } else if ("5".equals(sortCriterion)) {
+                            System.out.print("Введите название города: ");
+                            String comparedCityName = scanner.nextLine();
+                            City comparedCity = ((ArrayListToSortByStrategy<City>) collection).stream()
+                                    .filter(c -> c.getCityName().equals(comparedCityName))
+                                    .findFirst()
+                                    .orElse(null);
+                            if (comparedCity != null) {
+                                comparator = new CityDistanceComparator(comparedCity.getLatitude(), comparedCity.getLongitude());
+                            } else comparator = null;
+                        }
+                        if (comparator != null) {
+                            collection = ((ArrayListToSortByStrategy<City>) collection).sortByStrategy(sortStrategy, (Comparator<City>) comparator);
+                            isSorted = true;
+                            collection.forEach(System.out::println);
                         }
                     } else if ("Person".equals(currentType)) {
                         System.out.println("1 - По полу");
@@ -185,6 +211,11 @@ public class Program {
                         } else if ("3".equals(sortCriterion)) {
                             comparator = new PersonSurnameComparator();
                         }
+                        if (comparator != null) {
+                            collection = ((ArrayListToSortByStrategy<Person>) collection).sortByStrategy(sortStrategy, (Comparator<Person>) comparator);
+                            isSorted = true;
+                            collection.forEach(System.out::println);
+                        }
                     } else if ("Animal".equals(currentType)) {
                         System.out.println("1 - По виду");
                         System.out.println("2 - По цвету глаз");
@@ -197,13 +228,15 @@ public class Program {
                         } else if ("3".equals(sortCriterion)) {
                             comparator = new AnimalIsWoolenComparator();
                         }
+                        if (comparator != null) {
+                            collection = ((ArrayListToSortByStrategy<Animal>) collection).sortByStrategy(sortStrategy, (Comparator<Animal>) comparator);
+                            isSorted = true;
+                            collection.forEach(System.out::println);
+                        }
                     } else {
                         System.out.println("Сортировка для " + currentType + " пока не реализована.");
                     }
-                    if (comparator != null) {
-                        collection.sortByStrategy(sortStrategy, comparator);
-                        isSorted = true;
-                    }
+
                     break;
 
                 case "3":
@@ -214,9 +247,24 @@ public class Program {
                         System.out.println("Сначала отсортируйте коллекцию!");
                     } else {
                         System.out.println("Введите параметры искомого объекта...");
-                        <?> keyObject = new Object();
-
-                        collection.searchByStrategy(searchStrategy, keyObject, comparator);
+                        Object keyObject = createKeyObject(currentType, scanner);
+                        switch (currentType) {
+                            case "City":
+                                City cityKey = (City) keyObject;
+                                ((ArrayListToSortByStrategy<City>) collection)
+                                        .searchByStrategy(searchStrategy, cityKey, (Comparator<City>) comparator);
+                                break;
+                            case "Person":
+                                Person personKey = (Person) keyObject;
+                                ((ArrayListToSortByStrategy<Person>) collection)
+                                        .searchByStrategy(searchStrategy, personKey, (Comparator<Person>) comparator);
+                                break;
+                            case "Animal":
+                                Animal animalKey = (Animal) keyObject;
+                                ((ArrayListToSortByStrategy<Animal>) collection)
+                                        .searchByStrategy(searchStrategy, animalKey, (Comparator<Animal>) comparator);
+                                break;
+                        }
                     }
                     break;
 
@@ -249,10 +297,14 @@ public class Program {
 
     private static SortStrategy chooseSortStrategy(Scanner scanner) {
         System.out.println("\nВыберите алгоритм сортировки:");
-        System.out.println("1 - Сортировка слиянием (Merge Sort)");
+        System.out.println("1 - Сортировка пузырьком (Bubble Sort)");
+        System.out.println("2 - Быстрая сортировка (Quick Sort)");
         String type = scanner.nextLine();
         switch (type) {
-            case "1": return new MergeSortStrategy();
+            case "1":
+                return new BubbleSortStrategy();
+            case "2":
+                return new QuickSortStrategy();
             default:
                 System.out.println("Неверный выбор.");
                 return null;
@@ -265,6 +317,23 @@ public class Program {
         String type = scanner.nextLine();
         switch (type) {
             case "1": return new BinarySearchStrategy();
+            default:
+                System.out.println("Неверный выбор.");
+                return null;
+        }
+    }
+
+    private static Object createKeyObject(String type, Scanner scanner) {
+        switch (type) {
+            case "City":
+                City city = City.createObjectManually(scanner);
+                return city;
+            case "Person":
+                Person person = Person.createObjectManually(scanner);
+                return person;
+            case "Animal":
+                Animal animal = Animal.createObjectManually(scanner);
+                return animal;
             default:
                 System.out.println("Неверный выбор.");
                 return null;
