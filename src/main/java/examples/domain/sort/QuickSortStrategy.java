@@ -1,17 +1,17 @@
 package examples.domain.sort;
 
 
-import examples.data.repository.MyArrayList;
+import examples.data.repository.ArrayListToSortByStrategy;
 import examples.domain.interfaces.SortStrategy;
 
 import java.util.Comparator;
 
 class QuickSortStrategy<T> implements SortStrategy<T> {
-    public MyArrayList<T> sort(MyArrayList<T> array, Comparator<T> comparator) {
+    public ArrayListToSortByStrategy<T> sort(ArrayListToSortByStrategy<T> array, Comparator<T> comparator) {
         return quickSort(array, 0, array.size() - 1, comparator);
     }
 
-    MyArrayList<T> quickSort(MyArrayList<T> array, int leftBorder, int rightBorder, Comparator<T> comparator) {
+    ArrayListToSortByStrategy<T> quickSort(ArrayListToSortByStrategy<T> array, int leftBorder, int rightBorder, Comparator<T> comparator) {
         int leftMarker = leftBorder;
         int rightMarker = rightBorder;
         T pivot = array.get((leftMarker + rightMarker) / 2);

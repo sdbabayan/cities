@@ -1,10 +1,10 @@
 package examples.domain.interfaces;
 
 
-import examples.data.repository.MyArrayList;
+import examples.data.repository.ArrayListToSortByStrategy;
 
 import java.util.Comparator;
 
 public interface SortStrategy<T> {
-    MyArrayList<T> sort(MyArrayList<T> array, Comparator<T> comparator);
+    ArrayListToSortByStrategy<T> sort(ArrayListToSortByStrategy<T> list, Comparator<T> comparator);
 }
