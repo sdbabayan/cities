@@ -1,6 +1,6 @@
 package examples.domain.search;
 
-import examples.data.repository.MyArrayList;
+import examples.data.repository.ArrayListToSortByStrategy;
 import examples.domain.interfaces.SearchStrategy;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -8,7 +8,7 @@ import java.util.Comparator;
 public class BinarySearch<T> implements SearchStrategy<T> {
 
     @Override
-    public boolean search(MyArrayList<T> list, T object, Comparator<? super T> comparator) {
+    public boolean search(ArrayListToSortByStrategy<T> list, T object, Comparator<? super T> comparator) {
         if (list == null || object == null || comparator == null) {
             throw new IllegalArgumentException("List, object and comparator cannot be null");
         }
