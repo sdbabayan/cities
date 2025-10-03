@@ -5,13 +5,13 @@ import domain.interfaces.SortStrategy;
 
 import java.util.Comparator;
 
-public class QuickSortStrategy implements SortStrategy {
+public class QuickSortStrategy<T> implements SortStrategy<T> {
     @Override
-    public <T> ArrayListToSortByStrategy<T> sort(ArrayListToSortByStrategy<T> array, Comparator<T> comparator) {
+    public ArrayListToSortByStrategy<T> sort(ArrayListToSortByStrategy<T> array, Comparator<T> comparator) {
         return quickSort(array, 0, array.size() - 1, comparator);
     }
 
-    <T> ArrayListToSortByStrategy<T> quickSort(ArrayListToSortByStrategy<T> array, int leftBorder, int rightBorder, Comparator<T> comparator) {
+    ArrayListToSortByStrategy<T> quickSort(ArrayListToSortByStrategy<T> array, int leftBorder, int rightBorder, Comparator<T> comparator) {
         int leftMarker = leftBorder;
         int rightMarker = rightBorder;
         T pivot = array.get((leftMarker + rightMarker) / 2);

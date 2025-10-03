@@ -1,4 +1,4 @@
-package examples.data.model;
+package data.model;
 
 public class Location {
     private final double latitude;

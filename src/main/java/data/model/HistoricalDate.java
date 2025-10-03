@@ -1,4 +1,4 @@
-package examples.data.model;
+package data.model;
 
 public class HistoricalDate {
     private int day;

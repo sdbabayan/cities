@@ -5,8 +5,8 @@ import domain.interfaces.SortStrategy;
 
 import java.util.Comparator;
 
-public class BubbleSortStrategy implements SortStrategy {
-    public <T> ArrayListToSortByStrategy<T> sort(ArrayListToSortByStrategy<T> list, Comparator<T> comparator) {
+public class BubbleSortStrategy<T> implements SortStrategy<T> {
+    public ArrayListToSortByStrategy<T> sort(ArrayListToSortByStrategy<T> list, Comparator<T> comparator) {
         boolean needIteration = true;
         while (needIteration) {
             needIteration = false;
