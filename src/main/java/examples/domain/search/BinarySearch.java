@@ -14,7 +14,7 @@ public class BinarySearch<T> implements SearchStrategy<T> {
         }
 
         if (list.isEmpty()) {
-            return false;
+            return null;
         }
 
         int left = 0;
@@ -35,6 +35,6 @@ public class BinarySearch<T> implements SearchStrategy<T> {
             }
         }
 
-        return false;
+        return null;
     }
 }
