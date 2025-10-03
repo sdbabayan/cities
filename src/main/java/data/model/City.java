@@ -1,6 +1,7 @@
 package data.model;
 
 import data.repository.ArrayListToSortByStrategy;
+import domain.interfaces.IntValueReturnable;
 import net.datafaker.Faker;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-public class City {
+public class City implements IntValueReturnable {
     private String name;
     private double latitude;
     private double longitude;
@@ -194,6 +195,10 @@ public class City {
         double distance = R * c;
 
         return distance;
+    }
+    @Override
+    public int getIntValue() {
+        return (int)latitude;
     }
 
     @Override

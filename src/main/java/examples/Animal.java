@@ -149,7 +149,3 @@ public class Animal {
         //manual.forEach(System.out::println);
     }
 }
-
-
-class ArrayListToSortByStrategy<T> extends ArrayList<T> {
-}

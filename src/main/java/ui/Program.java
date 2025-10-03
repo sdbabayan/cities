@@ -9,6 +9,7 @@ import domain.interfaces.SearchStrategy;
 import domain.interfaces.SortStrategy;
 import domain.search.BinarySearchStrategy;
 import domain.sort.BubbleSortStrategy;
+import domain.sort.EvenSortStrategy;
 import domain.sort.QuickSortStrategy;
 
 import java.util.Comparator;
@@ -199,6 +200,7 @@ public class Program {
                             isSorted = true;
                             collection.forEach(System.out::println);
                         }
+                        onlyEvenSort(scanner);
                     } else if ("Person".equals(currentType)) {
                         System.out.println("1 - По полу");
                         System.out.println("2 - По возрасту");
@@ -216,6 +218,7 @@ public class Program {
                             isSorted = true;
                             collection.forEach(System.out::println);
                         }
+                        onlyEvenSort(scanner);
                     } else if ("Animal".equals(currentType)) {
                         System.out.println("1 - По виду");
                         System.out.println("2 - По цвету глаз");
@@ -276,6 +279,31 @@ public class Program {
                 default:
                     System.out.println("Неверный выбор.");
             }
+        }
+    }
+
+    private static void onlyEvenSort(Scanner scanner) {
+        System.out.println("\nПровести сортировку по четным значениям?");
+        System.out.println("1 - Да");
+        System.out.println("2 - Нет");
+
+        String type = scanner.nextLine();
+        switch (type) {
+            case "1":
+                EvenSortStrategy evenSortStrategy = new EvenSortStrategy();
+                switch (currentType) {
+                    case "City":
+                        evenSortStrategy.sortEven((ArrayListToSortByStrategy<City>) collection, sortStrategy, new IntValueComparator<City>());
+                        break;
+                    case "Person":
+                        //evenSortStrategy.sortEven((ArrayListToSortByStrategy<Person>) collection, sortStrategy, new IntValueComparator<Person>());
+                }
+                break;
+            case "2":
+                break;
+            default:
+                System.out.println("Неверный выбор.");
+                break;
         }
     }
 
