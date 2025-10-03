@@ -8,7 +8,7 @@ import java.util.Comparator;
 public class BinarySearch<T> implements SearchStrategy<T> {
 
     @Override
-    public boolean search(ArrayListToSortByStrategy<T> list, T object, Comparator<? super T> comparator) {
+    public T search(ArrayListToSortByStrategy<T> list, T object, Comparator<? super T> comparator) {
         if (list == null || object == null || comparator == null) {
             throw new IllegalArgumentException("List, object and comparator cannot be null");
         }
@@ -27,7 +27,7 @@ public class BinarySearch<T> implements SearchStrategy<T> {
             int comparison = comparator.compare(midElement, object);
 
             if (comparison == 0) {
-                return true;
+                return midElement;
             } else if (comparison < 0) {
                 left = mid + 1;
             } else {
