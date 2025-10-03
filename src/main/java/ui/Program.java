@@ -8,7 +8,10 @@ import data.repository.ArrayListToSortByStrategy;
 import domain.interfaces.SearchStrategy;
 import domain.interfaces.SortStrategy;
 import domain.search.BinarySearchStrategy;
+import domain.search.ConcurrentElementCounter;
 import domain.sort.BubbleSortStrategy;
+import domain.sort.MergeSortStrategy;
+import domain.sort.EvenSortStrategy;
 import domain.sort.QuickSortStrategy;
 
 import java.util.Comparator;
@@ -154,6 +157,7 @@ public class Program {
             System.out.println("1 - Вывод коллекции");
             System.out.println("2 - Сортировка коллекции");
             System.out.println("3 - Поиск элемента");
+            System.out.println("4 - Поиск числа вхождений элемента");
             System.out.println("B - Назад");
 
             String choice = scanner.nextLine();
@@ -199,6 +203,7 @@ public class Program {
                             isSorted = true;
                             collection.forEach(System.out::println);
                         }
+                        onlyEvenSort(scanner);
                     } else if ("Person".equals(currentType)) {
                         System.out.println("1 - По полу");
                         System.out.println("2 - По возрасту");
@@ -216,6 +221,7 @@ public class Program {
                             isSorted = true;
                             collection.forEach(System.out::println);
                         }
+                        onlyEvenSort(scanner);
                     } else if ("Animal".equals(currentType)) {
                         System.out.println("1 - По виду");
                         System.out.println("2 - По цвету глаз");
@@ -241,32 +247,56 @@ public class Program {
 
                 case "3":
                     searchStrategy = chooseSearchStrategy(scanner);
-                    if (searchStrategy == null) break;
-
-                    if ("1".equals(searchStrategy) && !isSorted) {
-                        System.out.println("Сначала отсортируйте коллекцию!");
+                    if (searchStrategy == null) {
+                        break;
                     } else {
                         System.out.println("Введите параметры искомого объекта...");
                         Object keyObject = createKeyObject(currentType, scanner);
                         switch (currentType) {
                             case "City":
                                 City cityKey = (City) keyObject;
-                                ((ArrayListToSortByStrategy<City>) collection)
-                                        .searchByStrategy(searchStrategy, cityKey, (Comparator<City>) comparator);
+                                System.out.println(((ArrayListToSortByStrategy<City>) collection)
+                                        .searchByStrategy(searchStrategy, cityKey, (Comparator<City>) comparator));
                                 break;
                             case "Person":
                                 Person personKey = (Person) keyObject;
-                                ((ArrayListToSortByStrategy<Person>) collection)
-                                        .searchByStrategy(searchStrategy, personKey, (Comparator<Person>) comparator);
+                                System.out.println(((ArrayListToSortByStrategy<Person>) collection)
+                                        .searchByStrategy(searchStrategy, personKey, (Comparator<Person>) comparator));
                                 break;
                             case "Animal":
                                 Animal animalKey = (Animal) keyObject;
-                                ((ArrayListToSortByStrategy<Animal>) collection)
-                                        .searchByStrategy(searchStrategy, animalKey, (Comparator<Animal>) comparator);
+                                System.out.println(((ArrayListToSortByStrategy<Animal>) collection)
+                                        .searchByStrategy(searchStrategy, animalKey, (Comparator<Animal>) comparator));
                                 break;
                         }
                     }
                     break;
+                case "4":
+                    System.out.println("Введите параметры искомого объекта...");
+                    Object targetObject = createKeyObject(currentType, scanner);
+                    long numberOfOccurrences = 0;
+                    switch (currentType) {
+                        case "City":
+                            City targetCity = (City) targetObject;
+                            numberOfOccurrences = ConcurrentElementCounter.countOccurrences(
+                                    (ArrayListToSortByStrategy<City>)collection, targetCity);
+                            break;
+                        case "Person":
+                            Person targetPerson = (Person) targetObject;
+                            numberOfOccurrences = ConcurrentElementCounter.countOccurrences(
+                                    (ArrayListToSortByStrategy<Person>)collection, targetPerson);
+                            break;
+                        case "Animal":
+                            Animal targetAnimal = (Animal) targetObject;
+                            numberOfOccurrences = ConcurrentElementCounter.countOccurrences(
+                                    (ArrayListToSortByStrategy<Animal>)collection, targetAnimal);
+                            break;
+                    }
+                    if (numberOfOccurrences == 0) {
+                        System.out.println("Нет вхождений");
+                    } else {
+                        System.out.println("Количество вхождений: " + numberOfOccurrences);
+                    }
 
                 case "B":
                 case "b":
@@ -276,6 +306,31 @@ public class Program {
                 default:
                     System.out.println("Неверный выбор.");
             }
+        }
+    }
+
+    private static void onlyEvenSort(Scanner scanner) {
+        System.out.println("\nПровести сортировку по четным значениям?");
+        System.out.println("1 - Да");
+        System.out.println("2 - Нет");
+
+        String type = scanner.nextLine();
+        switch (type) {
+            case "1":
+                EvenSortStrategy evenSortStrategy = new EvenSortStrategy();
+                switch (currentType) {
+                    case "City":
+                        evenSortStrategy.sortEven((ArrayListToSortByStrategy<City>) collection, sortStrategy, new IntValueComparator<City>());
+                        break;
+                    case "Person":
+                        //evenSortStrategy.sortEven((ArrayListToSortByStrategy<Person>) collection, sortStrategy, new IntValueComparator<Person>());
+                }
+                break;
+            case "2":
+                break;
+            default:
+                System.out.println("Неверный выбор.");
+                break;
         }
     }
 
@@ -308,7 +363,7 @@ public class Program {
             case "2":
                 return new QuickSortStrategy();
             case "3":
-                //return new MergeSortStrategy();
+                return new MergeSortStrategy();
             default:
                 System.out.println("Неверный выбор.");
                 return null;
@@ -319,6 +374,10 @@ public class Program {
         System.out.println("\nВыберите алгоритм поиска:");
         System.out.println("1 - Бинарный поиск (Binary Search)");
         String type = scanner.nextLine();
+        if ("1".equals(type) && !isSorted) {
+            System.out.println("Сначала отсортируйте коллекцию!");
+            return null;
+        }
         switch (type) {
             case "1":
                 return new BinarySearchStrategy();

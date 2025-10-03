@@ -1,20 +1,22 @@
-package examples;
+package data.model;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 import net.datafaker.Faker;
+import data.repository.ArrayListToSortByStrategy;
 
 public class Animal {
+
     public enum Colours {BROWN, GREEN, BLUE, GRAY};
 
     final private String kind;
     final private boolean isWoolen;
-    final private Colours eyesColour;
+    final private Colours eyesColor;
 
     private Animal(Builder builder){
         this.kind = builder.kind;
-        this.eyesColour = builder.eyesColour;
+        this.eyesColor = builder.eyesColor;
         this.isWoolen = builder.isWoolen;
         validate();
     }
@@ -23,19 +25,19 @@ public class Animal {
         if (kind == null){
             throw new IllegalArgumentException("Поле не может быть пустым");
         }
-        if (eyesColour == null){
+        if (eyesColor == null){
             throw new IllegalArgumentException("Поле не может быть пустым");
         }
     }
 
     public String getKind() { return kind; }
     public boolean getIsWoolen() { return isWoolen; }
-    public Colours getEyesColour() { return eyesColour; }
+    public Colours getEyesColor() { return eyesColor; }
 
     public static class Builder {
         private String kind;
         private boolean isWoolen;
-        private Colours eyesColour;
+        private Colours eyesColor;
 
         public Builder kind(String kind){
             this.kind = kind;
@@ -45,24 +47,24 @@ public class Animal {
             this.isWoolen = isWoolen;
             return this;
         }
-        public Builder eyesColour(Colours eyesColour){
-            this.eyesColour = eyesColour;
+        public Builder eyesColour(Colours eyesColor){
+            this.eyesColor = eyesColor;
             return this;
         }
         public Animal build() { return new Animal(this); }
     }
 
     public String toString() {
-        return String.format("Вид животного: %s; цвет глаз: %s; наличие шерсти: %s", kind, eyesColour, isWoolen);
+        return String.format("Вид животного: %s; цвет глаз: %s; наличие шерсти: %s", kind, eyesColor, isWoolen);
     }
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Animal)) return false;
         Animal animal = (Animal) o;
-        return isWoolen == animal.isWoolen && Objects.equals(kind, animal.kind) && eyesColour == animal.eyesColour;
+        return isWoolen == animal.isWoolen && Objects.equals(kind, animal.kind) && eyesColor == animal.eyesColor;
     }
     public int hashCode() {
-        return Objects.hash(kind, eyesColour, isWoolen);
+        return Objects.hash(kind, eyesColor, isWoolen);
     }
 
     public static ArrayListToSortByStrategy<Animal> loadDataFromFile(String pathToFile) {
@@ -96,6 +98,16 @@ public class Animal {
         return list;
     }
 
+    public static Animal createObjectManually(Scanner scanner) {
+        System.out.print("Вид: ");
+        String kind = scanner.nextLine();
+        System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
+        Colours colour = Colours.valueOf(scanner.nextLine().trim().toUpperCase());
+        System.out.print("Есть шерсть? (true/false): ");
+        boolean wool = Boolean.parseBoolean(scanner.nextLine());
+        return new Animal.Builder().kind(kind).eyesColour(colour).isWoolen(wool).build();
+    }
+
     public static ArrayListToSortByStrategy<Animal> loadDataManually() {
         ArrayListToSortByStrategy<Animal> list = new ArrayListToSortByStrategy<>();
         Scanner sc = new Scanner(System.in);
@@ -103,13 +115,7 @@ public class Animal {
         int qty = Integer.parseInt(sc.nextLine());
         for (int i = 0; i < qty; i++) {
             System.out.println("Животное №" + (i + 1));
-            System.out.print("Вид: ");
-            String kind = sc.nextLine();
-            System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
-            Colours colour = Colours.valueOf(sc.nextLine().trim().toUpperCase());
-            System.out.print("Есть шерсть? (true/false): ");
-            boolean wool = Boolean.parseBoolean(sc.nextLine());
-            list.add(new Animal.Builder().kind(kind).eyesColour(colour).isWoolen(wool).build());
+            list.add(createObjectManually(sc));
         }
         return list;
     }
@@ -150,6 +156,3 @@ public class Animal {
     }
 }
 
-
-class ArrayListToSortByStrategy<T> extends ArrayList<T> {
-}

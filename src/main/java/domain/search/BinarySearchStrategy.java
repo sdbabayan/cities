@@ -5,8 +5,7 @@ import domain.interfaces.SearchStrategy;
 
 import java.util.Comparator;
 
-public class BinarySearch<T> implements SearchStrategy<T> {
-
+public class BinarySearchStrategy<T> implements SearchStrategy<T> {
     @Override
     public T search(ArrayListToSortByStrategy<T> list, T object, Comparator<? super T> comparator) {
         if (list == null || object == null || comparator == null) {
