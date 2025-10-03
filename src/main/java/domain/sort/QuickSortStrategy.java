@@ -1,12 +1,12 @@
 package domain.sort;
 
-
 import data.repository.ArrayListToSortByStrategy;
 import domain.interfaces.SortStrategy;
 
 import java.util.Comparator;
 
-class QuickSortStrategy<T> implements SortStrategy<T> {
+public class QuickSortStrategy<T> implements SortStrategy<T> {
+    @Override
     public ArrayListToSortByStrategy<T> sort(ArrayListToSortByStrategy<T> array, Comparator<T> comparator) {
         return quickSort(array, 0, array.size() - 1, comparator);
     }

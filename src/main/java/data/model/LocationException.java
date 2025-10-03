@@ -1,6 +1,6 @@
 package data.model;
 
-public class LocationException extends RuntimeException {
+public class LocationException extends Exception {
     public LocationException(String message) {
         super(message);
     }
