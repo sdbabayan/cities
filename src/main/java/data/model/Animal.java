@@ -122,7 +122,6 @@ public class Animal {
                         System.out.println("Животное №" + (i + 1));
                         System.out.print("Вид: ");
                         String kind = sc.nextLine();
-                        System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
                         Colours colour = null;
                         while (colour == null) {
                             System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
