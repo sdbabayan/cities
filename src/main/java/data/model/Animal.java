@@ -117,26 +117,28 @@ public class Animal {
         Scanner sc = new Scanner(System.in);
         System.out.print("Сколько животных добавить? ");
         int qty = Integer.parseInt(sc.nextLine());
-
-        return IntStream.range(0, qty)
-                .mapToObj(i -> {
-                    System.out.println("Животное №" + (i + 1));
-                    System.out.print("Вид: ");
-                    String kind = sc.nextLine();
-                    System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
-                    String colourInput = sc.nextLine().trim().toUpperCase();
-                    Colours colour;
-                    try {
-                        colour = Colours.valueOf(colourInput);
-                    } catch (IllegalArgumentException e) {
-                        throw new IllegalArgumentException("Недопустимый цвет: " + colourInput);
-                    }
-                    System.out.print("Есть шерсть? (true/false): ");
-                    boolean wool = Boolean.parseBoolean(sc.nextLine());
-                    return new Animal.Builder().kind(kind).eyesColour(colour).isWoolen(wool).build();
-                })
-                .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
-    }
+            return IntStream.range(0, qty)
+                    .mapToObj(i -> {
+                        System.out.println("Животное №" + (i + 1));
+                        System.out.print("Вид: ");
+                        String kind = sc.nextLine();
+                        System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
+                        Colours colour = null;
+                        while (colour == null) {
+                            System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
+                            String input = sc.nextLine().trim().toUpperCase();
+                            try {
+                                colour = Colours.valueOf(input);
+                            } catch (IllegalArgumentException e) {
+                                System.out.println("Некорректный цвет. Допустимые значения: BROWN, GREEN, BLUE, GRAY.");
+                            }
+                        }
+                        System.out.print("Есть шерсть? (true/false): ");
+                        boolean wool = Boolean.parseBoolean(sc.nextLine());
+                        return new Animal.Builder().kind(kind).eyesColour(colour).isWoolen(wool).build();
+                    })
+                    .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
+        }
 
     public static Animal createObjectManually(Scanner sc) {
         System.out.println("Введите данные животного:");
