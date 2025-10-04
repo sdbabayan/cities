@@ -9,17 +9,21 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-public class EvenSortStrategy implements SortEvenStrategy {
+public class EvenSortStrategy<T extends IntValueReturnable> implements SortEvenStrategy<T> {
     @Override
-    public <T extends IntValueReturnable> void sortEven(ArrayListToSortByStrategy<T> list, SortStrategy sortStrategy, Comparator<T> comparator) {
+    public void sortEven(ArrayListToSortByStrategy<T> list, SortStrategy<T> sortStrategy, Comparator<T> comparator) {
         ArrayListToSortByStrategy<T> evens = new ArrayListToSortByStrategy<>();
         for (T obj : list) {
             if (obj.getIntValue() % 2 == 0) {
                 evens.add(obj);
             }
         }
-
+        System.out.println("evens до сортировки:");
+        evens.forEach(System.out::println);
         evens.sortByStrategy(sortStrategy, comparator);
+        System.out.println("evens после сортировки:");
+        evens.forEach(System.out::println);
+        System.out.println();
 
         int idx = 0;
         for (int i = 0; i < list.size(); i++) {
