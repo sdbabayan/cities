@@ -11,8 +11,6 @@ import net.datafaker.Faker;
 public class Animal {
     public enum Colours {BROWN, GREEN, BLUE, GRAY}
 
-    ;
-
     final private String kind;
     final private boolean isWoolen;
     final private Colours eyesColour;
@@ -126,7 +124,13 @@ public class Animal {
                     System.out.print("Вид: ");
                     String kind = sc.nextLine();
                     System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
-                    Colours colour = Colours.valueOf(sc.nextLine().trim().toUpperCase());
+                    String colourInput = sc.nextLine().trim().toUpperCase();
+                    Colours colour;
+                    try {
+                        colour = Colours.valueOf(colourInput);
+                    } catch (IllegalArgumentException e) {
+                        throw new IllegalArgumentException("Недопустимый цвет: " + colourInput);
+                    }
                     System.out.print("Есть шерсть? (true/false): ");
                     boolean wool = Boolean.parseBoolean(sc.nextLine());
                     return new Animal.Builder().kind(kind).eyesColour(colour).isWoolen(wool).build();
