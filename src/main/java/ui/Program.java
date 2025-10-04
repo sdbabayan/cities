@@ -323,7 +323,8 @@ public class Program {
                         evenSortStrategy.sortEven((ArrayListToSortByStrategy<City>) collection, sortStrategy, new IntValueComparator<City>());
                         break;
                     case "Person":
-                        //evenSortStrategy.sortEven((ArrayListToSortByStrategy<Person>) collection, sortStrategy, new IntValueComparator<Person>());
+                        evenSortStrategy.sortEven((ArrayListToSortByStrategy<Person>) collection, sortStrategy, new IntValueComparator<Person>());
+                        break;
                 }
                 break;
             case "2":
