@@ -5,6 +5,7 @@ import data.model.Animal;
 import data.model.City;
 import data.model.Person;
 import data.repository.ArrayListToSortByStrategy;
+import domain.additionalTasks.SecondTask;
 import domain.interfaces.SearchStrategy;
 import domain.interfaces.SortStrategy;
 import domain.search.BinarySearchStrategy;
@@ -203,7 +204,10 @@ public class Program {
                             isSorted = true;
                             collection.forEach(System.out::println);
                         }
-                        onlyEvenSort(scanner);
+                        if (collection != null && !collection.isEmpty()) {
+                            onlyEvenSort(scanner);
+                            writeCollectionToFile(scanner);
+                        }
                     } else if ("Person".equals(currentType)) {
                         System.out.println("1 - По полу");
                         System.out.println("2 - По возрасту");
@@ -221,7 +225,10 @@ public class Program {
                             isSorted = true;
                             collection.forEach(System.out::println);
                         }
-                        onlyEvenSort(scanner);
+                        if (collection != null && !collection.isEmpty()) {
+                            onlyEvenSort(scanner);
+                            writeCollectionToFile(scanner);
+                        }
                     } else if ("Animal".equals(currentType)) {
                         System.out.println("1 - По виду");
                         System.out.println("2 - По цвету глаз");
@@ -238,6 +245,9 @@ public class Program {
                             collection = ((ArrayListToSortByStrategy<Animal>) collection).sortByStrategy(sortStrategy, (Comparator<Animal>) comparator);
                             isSorted = true;
                             collection.forEach(System.out::println);
+                        }
+                        if (collection != null && !collection.isEmpty()) {
+                            writeCollectionToFile(scanner);
                         }
                     } else {
                         System.out.println("Сортировка для " + currentType + " пока не реализована.");
@@ -324,6 +334,66 @@ public class Program {
                         break;
                     case "Person":
                         evenSortStrategy.sortEven((ArrayListToSortByStrategy<Person>) collection, sortStrategy, new IntValueComparator<Person>());
+                        break;
+                }
+                break;
+            case "2":
+                break;
+            default:
+                System.out.println("Неверный выбор.");
+                break;
+        }
+    }
+
+    private static void writeCollectionToFile(Scanner scanner) {
+        System.out.println("\nВыполнить запись коллекции в файл?");
+        System.out.println("1 - Да");
+        System.out.println("2 - Нет");
+
+        String type = scanner.nextLine();
+        switch (type) {
+            case "1":
+                System.out.print("Введите путь к файлу: ");
+                String pathToFile = scanner.nextLine();
+                switch (currentType) {
+                    case "City":
+                        SecondTask.writeCollectionToFile(collection, pathToFile, "Города");
+                        break;
+                    case "Person":
+                        SecondTask.writeCollectionToFile(collection, pathToFile, "Люди");
+                        break;
+                    case "Animal":
+                        SecondTask.writeCollectionToFile(collection, pathToFile, "Животные");
+                        break;
+                }
+                break;
+            case "2":
+                break;
+            default:
+                System.out.println("Неверный выбор.");
+                break;
+        }
+    }
+
+    private static void writeElementToFile(Scanner scanner) {
+        System.out.println("\nВыполнить запись найденного элемента в файл?");
+        System.out.println("1 - Да");
+        System.out.println("2 - Нет");
+
+        String type = scanner.nextLine();
+        switch (type) {
+            case "1":
+                System.out.print("Введите путь к файлу: ");
+                String pathToFile = scanner.nextLine();
+                switch (currentType) {
+                    case "City":
+                        SecondTask.writeFoundObjectToFile(collection, pathToFile, "Город");
+                        break;
+                    case "Person":
+                        SecondTask.writeFoundObjectToFile(collection, pathToFile, "Человек");
+                        break;
+                    case "Animal":
+                        SecondTask.writeFoundObjectToFile(collection, pathToFile, "Животное");
                         break;
                 }
                 break;
