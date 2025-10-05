@@ -18,9 +18,8 @@ public class ArrayListToSortByStrategy<T> extends ArrayList<T> {
 
     public ArrayListToSortByStrategy<T> sortByStrategy(SortStrategy<T> sortStrategy, Comparator<T> comparator) {
         ArrayListToSortByStrategy<T> sorted = sortStrategy.sort(this, comparator);
-        ArrayListToSortByStrategy<T> sortedCopy = new ArrayListToSortByStrategy<>(sorted);
         this.clear();
-        this.addAll(sortedCopy);
+        this.addAll(sorted);
         return this;
     }
 
