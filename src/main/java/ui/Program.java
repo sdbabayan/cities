@@ -265,18 +265,39 @@ public class Program {
                         switch (currentType) {
                             case "City":
                                 City cityKey = (City) keyObject;
-                                System.out.println(((ArrayListToSortByStrategy<City>) collection)
-                                        .searchByStrategy(searchStrategy, cityKey, (Comparator<City>) comparator));
+                                // TODO поменять boolean на City
+                                boolean city = ((ArrayListToSortByStrategy<City>) collection)
+                                        .searchByStrategy(searchStrategy, cityKey, (Comparator<City>) comparator);
+                                System.out.println(city);
+                                // TODO удалить:
+                                writeElementToFile(scanner, city);
+                                // if (city != null) {
+                                //     writeElementToFile(scanner, city);
+                                // }
                                 break;
                             case "Person":
                                 Person personKey = (Person) keyObject;
-                                System.out.println(((ArrayListToSortByStrategy<Person>) collection)
-                                        .searchByStrategy(searchStrategy, personKey, (Comparator<Person>) comparator));
+                                // TODO поменять boolean на Person
+                                boolean person = ((ArrayListToSortByStrategy<Person>) collection)
+                                        .searchByStrategy(searchStrategy, personKey, (Comparator<Person>) comparator);
+                                System.out.println(person);
+                                // TODO удалить:
+                                writeElementToFile(scanner, person);
+                                // if (person != null) {
+                                //     writeElementToFile(scanner, person);
+                                // }
                                 break;
                             case "Animal":
                                 Animal animalKey = (Animal) keyObject;
-                                System.out.println(((ArrayListToSortByStrategy<Animal>) collection)
-                                        .searchByStrategy(searchStrategy, animalKey, (Comparator<Animal>) comparator));
+                                // TODO поменять boolean на Animal
+                                boolean animal = ((ArrayListToSortByStrategy<Animal>) collection)
+                                        .searchByStrategy(searchStrategy, animalKey, (Comparator<Animal>) comparator);
+                                System.out.println(animal);
+                                // TODO удалить:
+                                writeElementToFile(scanner, animal);
+                                // if (animal != null) {
+                                //     writeElementToFile(scanner, animal);
+                                // }
                                 break;
                         }
                     }
@@ -375,7 +396,7 @@ public class Program {
         }
     }
 
-    private static void writeElementToFile(Scanner scanner) {
+    private static void writeElementToFile(Scanner scanner, Object object) {
         System.out.println("\nВыполнить запись найденного элемента в файл?");
         System.out.println("1 - Да");
         System.out.println("2 - Нет");
@@ -387,13 +408,16 @@ public class Program {
                 String pathToFile = scanner.nextLine();
                 switch (currentType) {
                     case "City":
-                        SecondTask.writeFoundObjectToFile(collection, pathToFile, "Город");
+                        // TODO object привести к City
+                        SecondTask.writeFoundObjectToFile(object, pathToFile, "Город");
                         break;
                     case "Person":
-                        SecondTask.writeFoundObjectToFile(collection, pathToFile, "Человек");
+                        // TODO object привести к Person
+                        SecondTask.writeFoundObjectToFile(object, pathToFile, "Человек");
                         break;
                     case "Animal":
-                        SecondTask.writeFoundObjectToFile(collection, pathToFile, "Животное");
+                        // TODO object привести к Animal
+                        SecondTask.writeFoundObjectToFile(object, pathToFile, "Животное");
                         break;
                 }
                 break;
