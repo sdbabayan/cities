@@ -4,6 +4,9 @@ import data.repository.ArrayListToSortByStrategy;
 import domain.interfaces.IntValueReturnable;
 import domain.search.BinarySearchStrategy;
 import domain.sort.BubbleSortStrategy;
+import domain.sort.EvenSortStrategy;
+import domain.sort.MergeSortStrategy;
+import domain.sort.QuickSortStrategy;
 import net.datafaker.Faker;
 
 import java.io.BufferedWriter;
@@ -13,6 +16,8 @@ import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Person implements IntValueReturnable {
     private Sex sex;
@@ -92,68 +97,63 @@ public class Person implements IntValueReturnable {
 
 
     public static ArrayListToSortByStrategy<Person> loadDataFromFile(String pathToFile) {
-        ArrayListToSortByStrategy<Person> persons = new ArrayListToSortByStrategy<>();
-        List<String> lines = null;
         try {
-            lines = Files.readAllLines(Paths.get(pathToFile));
+            return Files.lines(Paths.get(pathToFile))
+                    .map(line -> line.split(";"))
+                    .filter(parts -> parts.length == 3)
+                    .map(parts -> {
+                        try {
+                            String surname = parts[0].trim();
+                            String sex = parts[1].trim();
+                            int age = Integer.parseInt(parts[2].trim());
+                            return new Person(sex, surname, age);
+                        } catch (PersonDataException e) {
+                            System.out.println("Ошибка данных: " + e.getMessage() + " в строке: " + String.join(";", parts));
+                            return null;
+                        } catch (NumberFormatException e) {
+                            System.out.println("Неверный формат возраста в строке: " + String.join(";", parts));
+                            return null;
+                        } catch (Exception e) {
+                            System.out.println("Неожиданная ошибка в строке: " + String.join(";", parts) + " - " + e.getMessage());
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
         } catch (IOException e) {
             System.err.println("Ошибка чтения файла: " + e.getMessage());
-            return persons;
+            return new ArrayListToSortByStrategy<>();
         }
-
-        for (String line : lines) {
-            try {
-                // формат строки: surname;sex;age
-                String[] parts = line.split(";");
-                if (parts.length == 3) {
-                    String surname = parts[0].trim();
-                    String sex = parts[1].trim();
-                    int age = Integer.parseInt(parts[2].trim());
-
-                    Person person = new Person(sex, surname, age);
-                    persons.add(person);
-                } else {
-                    System.out.println("Неверный формат строки: " + line);
-                }
-            } catch (PersonDataException e) {
-                System.out.println("Ошибка данных: " + e.getMessage() + " в строке: " + line);
-            } catch (NumberFormatException e) {
-                System.out.println("Неверный формат возраста в строке: " + line);
-            } catch (Exception e) {
-                System.out.println("Неожиданная ошибка в строке: " + line + " - " + e.getMessage());
-            }
-        }
-        return persons;
     }
 
     public static ArrayListToSortByStrategy<Person> loadRandomData(int elementsQty) {
-        ArrayListToSortByStrategy<Person> persons = new ArrayListToSortByStrategy<>();
         Faker faker = new Faker(new Locale("ru", "RU"));
 
-        // Список русских фамилий
         String[] russianSurnames = {
                 "Иванов", "Петров", "Сидоров", "Смирнов", "Кузнецов",
                 "Попов", "Васильев", "Павлов", "Семенов", "Голубев",
                 "Виноградов", "Богданов", "Воробьев", "Федоров", "Михайлов"
         };
 
-        for (int i = 0; i < elementsQty; i++) {
-            try {
-                String surname = russianSurnames[faker.random().nextInt(russianSurnames.length)];
-                Sex sex = faker.random().nextBoolean() ? Sex.MALE : Sex.FEMALE;
-                int age = faker.number().numberBetween(18, 80);
+        return IntStream.range(0, elementsQty)
+                .mapToObj(i -> {
+                    try {
+                        String surname = russianSurnames[faker.random().nextInt(russianSurnames.length)];
+                        Sex sex = faker.random().nextBoolean() ? Sex.MALE : Sex.FEMALE;
+                        int age = faker.number().numberBetween(18, 80);
 
-                Person person = new Person.Builder()
-                        .setPersonSurname(surname)
-                        .setPersonSex(sex)
-                        .setPersonAge(age)
-                        .build();
-                persons.add(person);
-            } catch (Exception e) {
-                System.out.println("Ошибка создания случайного Person: " + e.getMessage());
-            }
-        }
-        return persons;
+                        return new Person.Builder()
+                                .setPersonSurname(surname)
+                                .setPersonSex(sex)
+                                .setPersonAge(age)
+                                .build();
+                    } catch (Exception e) {
+                        System.out.println("Ошибка создания случайного Person: " + e.getMessage());
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
     }
 
     public static Person createObjectManually(Scanner scanner) {
@@ -193,23 +193,25 @@ public class Person implements IntValueReturnable {
 
     public static ArrayListToSortByStrategy<Person> loadDataManually() {
         Scanner scanner = new Scanner(System.in);
-        ArrayListToSortByStrategy<Person> persons = new ArrayListToSortByStrategy();
         System.out.println("\n=== Заполнение коллекции Person ===");
-        boolean continueAdding = true;
 
-        while (continueAdding) {
-            Person person = createObjectManually(scanner);
-            persons.add(person);
-            System.out.println("Объект добавлен: " + String.valueOf(person));
-            System.out.print("\nДобавить еще одного человека? (y/n): ");
-            String answer = scanner.nextLine().trim().toLowerCase();
-            if (!answer.equals("y") && !answer.equals("yes") && !answer.equals("д") && !answer.equals("да")) {
-                continueAdding = false;
-            }
-        }
+        System.out.print("Сколько человек добавить? ");
+        int qty = Integer.parseInt(scanner.nextLine());
 
-        System.out.println("Коллекция заполнена. Всего объектов: " + persons.size());
-        return persons;
+        return IntStream.range(0, qty)
+                .mapToObj(i -> {
+                    try {
+                        System.out.println("\nЧеловек №" + (i + 1));
+                        Person person = createObjectManually(scanner);
+                        System.out.println("Объект добавлен: " + person);
+                        return person;
+                    } catch (Exception e) {
+                        System.out.println("Ошибка при создании человека: " + e.getMessage());
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
     }
 
     public Person(String sex, String surname, int age) {
@@ -298,10 +300,11 @@ public class Person implements IntValueReturnable {
             System.err.println("Ошибка записи в файл: " + e.getMessage());
         }
     }
-    /*
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("=== ТЕСТИРОВАНИЕ КЛАССА PERSON ===\n");
+
+         System.out.println("=== ТЕСТИРОВАНИЕ КЛАССА PERSON ===\n");
 
         System.out.println("1. ТЕСТ КОНСТРУКТОРА С ВАЛИДНЫМИ ЗНАЧЕНИЯМИ:");
 
@@ -406,30 +409,14 @@ public class Person implements IntValueReturnable {
             if (!persons.isEmpty()) {
                 System.out.println("\n--- БИНАРНЫЙ ПОИСК ---");
                 Person searchPerson = (Person) persons.get(0);
-                boolean found = persons.searchByStrategy(new BinarySearchStrategy<>(), searchPerson, bySurname);
+                Person foundPerson = persons.searchByStrategy(new BinarySearchStrategy<>(), searchPerson, bySurname);
 
-                System.out.println("Поиск " + searchPerson.getSurname() + ": " + (found ? "НАЙДЕН" : "НЕ НАЙДЕН"));
+                System.out.println("Поиск " + searchPerson.getSurname() + ": " + (foundPerson != null ? "НАЙДЕН " + foundPerson : "НЕ НАЙДЕН"));
 
                 // Дополнительно: поиск несуществующего элемента
                 Person nonExistentPerson = new Person("MALE", "Несуществующий", 99);
-                boolean notFound = persons.searchByStrategy(new BinarySearchStrategy<>(), nonExistentPerson, bySurname);
-                System.out.println("Поиск несуществующего: " + (notFound ? "НАЙДЕН" : "НЕ НАЙДЕН - корректно"));
-            }
-
-            // Дополнительные тесты с разными стратегиями поиска
-            System.out.println("\n--- ТЕСТ РАЗНЫХ СТРАТЕГИЙ ПОИСКА ---");
-
-            // Линейный поиск (если у вас есть такая стратегия)
-            if (!persons.isEmpty()) {
-                Person searchPerson = (Person) persons.get(persons.size() - 1); // берем последний элемент
-
-                // Бинарный поиск
-                boolean binaryFound = persons.searchByStrategy(new BinarySearchStrategy<>(), searchPerson, bySurname);
-                System.out.println("Бинарный поиск: " + (binaryFound ? "НАЙДЕН" : "НЕ НАЙДЕН"));
-
-                // Если есть LinearSearchStrategy
-                // boolean linearFound = persons.searchByStrategy(new LinearSearchStrategy<>(), searchPerson, bySurname);
-                // System.out.println("Линейный поиск: " + (linearFound ? "НАЙДЕН" : "НЕ НАЙДЕН"));
+                Person notFoundPerson = persons.searchByStrategy(new BinarySearchStrategy<>(), nonExistentPerson, bySurname);
+                System.out.println("Поиск несуществующего: " + (notFoundPerson != null ? "НАЙДЕН " + notFoundPerson : "НЕ НАЙДЕН - корректно"));
             }
         }
 
@@ -444,10 +431,10 @@ public class Person implements IntValueReturnable {
 
             // Ищем человека с возрастом как у первого в списке
             Person searchTarget = testPersons.get(0);
-            boolean ageFound = testPersons.searchByStrategy(new BinarySearchStrategy<>(), searchTarget, byAge);
+            Person ageFoundPerson = testPersons.searchByStrategy(new BinarySearchStrategy<>(), searchTarget, byAge);
 
             System.out.println("Поиск по возрасту " + searchTarget.getAge() + ": " +
-                    (ageFound ? "НАЙДЕН" : "НЕ НАЙДЕН"));
+                    (ageFoundPerson != null ? "НАЙДЕН " + ageFoundPerson : "НЕ НАЙДЕН"));
 
             // Вывод тестовой коллекции
             System.out.println("Тестовая коллекция:");
@@ -458,5 +445,5 @@ public class Person implements IntValueReturnable {
         System.out.println("\n=== ТЕСТИРОВАНИЕ ЗАВЕРШЕНО ===");
         scanner.close();
     }
-    */
+
 }
