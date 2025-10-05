@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class City implements IntValueReturnable {
     private String name;
@@ -79,67 +81,60 @@ public class City implements IntValueReturnable {
     }
 
     public static ArrayListToSortByStrategy<City> loadDataFromFile(String pathToFile) {
-        ArrayListToSortByStrategy<City> cities = new ArrayListToSortByStrategy<>();
-        List<String> lines = null;
         try {
-            lines = Files.readAllLines(Paths.get(pathToFile));
+            return Files.lines(Paths.get(pathToFile))
+                    .map(line -> line.split(";"))
+                    .filter(parts -> parts.length == 4)
+                    // формат строки: name;latitude;longitude;foundationDate
+                    .map(parts -> {
+                        // формат строки: name;latitude;longitude;foundationDate
+                        String name = parts[0];
+                        double lat = Double.parseDouble(parts[1]);
+                        double lon = Double.parseDouble(parts[2]);
+                        String[] partsOfDate = parts[3].split("\\.");
+                        int day = Integer.parseInt(partsOfDate[0]);
+                        int month = Integer.parseInt(partsOfDate[1]);
+                        int year = Integer.parseInt(partsOfDate[2]);
+                        LocalDate date = LocalDate.of(year, month, day);
+                        return new City.Builder()
+                                .setName(name)
+                                .setLatitude(lat)
+                                .setLongitude(lon)
+                                .setFoundationDate(date)
+                                .build();
+                    })
+                    .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
         } catch (IOException e) {
             System.out.println("Ошибка чтения файла: " + e.getMessage());
-            return cities;
+            return new ArrayListToSortByStrategy<>();
         }
-        for (String line : lines) {
-            try {
-                // формат строки: name;latitude;longitude;foundationDate
-                String[] parts = line.split(";");
-                if (parts.length == 4) {
-                    String name = parts[0];
-                    double lat = Double.parseDouble(parts[1]);
-                    double lon = Double.parseDouble(parts[2]);
-                    String[] partsOfDate = parts[3].split("\\.");
-                    int day = Integer.parseInt(partsOfDate[0]);
-                    int month = Integer.parseInt(partsOfDate[1]);
-                    int year = Integer.parseInt(partsOfDate[2]);
-                    LocalDate date = LocalDate.of(year, month, day);
-                    City city = new City.Builder()
-                            .setName(name)
-                            .setLatitude(lat)
-                            .setLongitude(lon)
-                            .setFoundationDate(date)
-                            .build();
-                    cities.add(city);
-                }
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-        return cities;
     }
 
     public static ArrayListToSortByStrategy<City> loadRandomData(int elementsQty) {
-        ArrayListToSortByStrategy<City> cities = new ArrayListToSortByStrategy<>();
         Faker faker = new Faker(new Locale("ru", "RU"));
-        for (int i = 0; i < elementsQty; i++) {
-            try {
-                String name = faker.address().cityName();
-                double lat = faker.number().randomDouble(6, -90, 90);
-                double lon = faker.number().randomDouble(6, -180, 180);
-                LocalDate date = LocalDate.of(
-                        faker.number().numberBetween(1000, 2023),
-                        faker.number().numberBetween(1, 12),
-                        faker.number().numberBetween(1, 28)
-                );
-                City city = new City.Builder()
-                        .setName(name)
-                        .setLatitude(lat)
-                        .setLongitude(lon)
-                        .setFoundationDate(date)
-                        .build();
-                cities.add(city);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
-        return cities;
+        return IntStream.range(0, elementsQty)
+                .mapToObj(i -> {
+                    try {
+                        String name = faker.address().cityName();
+                        double lat = faker.number().randomDouble(6, -90, 90);
+                        double lon = faker.number().randomDouble(6, -180, 180);
+                        LocalDate date = LocalDate.of(
+                                faker.number().numberBetween(1000, 2023),
+                                faker.number().numberBetween(1, 12),
+                                faker.number().numberBetween(1, 28)
+                        );
+                        return new City.Builder()
+                                .setName(name)
+                                .setLatitude(lat)
+                                .setLongitude(lon)
+                                .setFoundationDate(date)
+                                .build();
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        return null;
+                    }
+                })
+                .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
     }
 
     public static String readCityName(Scanner scanner, String prompt) {
@@ -238,22 +233,20 @@ public class City implements IntValueReturnable {
     }
 
     public static ArrayListToSortByStrategy<City> loadDataManually(Scanner scanner)  {
-        ArrayListToSortByStrategy<City> cities = new ArrayListToSortByStrategy<>();
-
         System.out.println("Введите количество городов:");
-        int n = Integer.parseInt(scanner.nextLine());
+        int qty = Integer.parseInt(scanner.nextLine());
 
-        for (int i = 0; i < n; i++) {
-            try {
-                City city = createObjectManually(scanner);
-                cities.add(city);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
-
-
-        return cities;
+        return IntStream.range(0, qty)
+                .mapToObj(i -> {
+                    System.out.println("Город №" + (i + 1));
+                    try {
+                        return createObjectManually(scanner);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        return null;
+                    }
+                })
+                .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
     }
 
     public double getDistance(double latitude, double longitude) {
