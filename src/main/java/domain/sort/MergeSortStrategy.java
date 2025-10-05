@@ -21,12 +21,17 @@ public class MergeSortStrategy<T> implements SortStrategy<T> {
     @Override
     public ArrayListToSortByStrategy<T> sort(ArrayListToSortByStrategy<T> list, Comparator<T> comparator) {
         if (list == null || list.size() <= 1) {
-            return new ArrayListToSortByStrategy<T>(list);
+            return list;
         }
 
         try {
             List<T> sorted = parallelMergeSort(new ArrayList<T>(list), comparator, 0);
-            return new ArrayListToSortByStrategy<>(sorted);
+
+            // ИЗМЕНЯЕМ ИСХОДНУЮ КОЛЛЕКЦИЮ
+            list.clear();
+            list.addAll(sorted);
+
+            return list; // ← возвращаем ту же коллекцию
         } catch (InterruptedException | ExecutionException e) {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Sorting was interrupted", e);
