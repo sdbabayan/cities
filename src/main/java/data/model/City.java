@@ -9,7 +9,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class City implements IntValueReturnable {
     private String name;
@@ -34,28 +37,40 @@ public class City implements IntValueReturnable {
             city = new City();
         }
 
-        public Builder setName(String name) {
-            city.name = name;
+        public Builder setName(String name) throws IllegalArgumentException{
+            if (name == null || name.trim().isEmpty()) {
+                throw new IllegalArgumentException("Название города не может быть пустым");
+            }
+            if (!name.matches("[\\p{L} .'-]+")) {
+                throw new IllegalArgumentException("Название города содержит недопустимые символы");
+            }
+            city.name = name.trim();
             return this;
         }
 
-        public Builder setLatitude(double latitude) throws LocationException {
+        public Builder setLatitude(double latitude) throws IllegalArgumentException {
             if (latitude < -90.0 || latitude > 90.0) {
-                throw new LocationException("Широта должна быть от -90 до 90 градусов");
+                throw new IllegalArgumentException("Широта должна быть от -90 до 90 градусов");
             }
             city.latitude = latitude;
             return this;
         }
 
-        public Builder setLongitude(double longitude) throws LocationException {
+        public Builder setLongitude(double longitude) throws IllegalArgumentException {
             if (longitude < -180.0 || longitude > 180.0) {
-                throw new LocationException("Долгота должна быть от -180 до 180 градусов");
+                throw new IllegalArgumentException("Долгота должна быть от -180 до 180 градусов");
             }
             city.longitude = longitude;
             return this;
         }
 
-        public Builder setFoundationDate (LocalDate foundationDate) {
+        public Builder setFoundationDate (LocalDate foundationDate) throws IllegalArgumentException{
+            if (foundationDate == null) {
+                throw new IllegalArgumentException("Дата основания не может быть пустой");
+            }
+            if (foundationDate.isAfter(LocalDate.now())) {
+                throw new IllegalArgumentException("Дата основания не может быть в будущем");
+            }
             city.foundationDate = foundationDate;
             return this;
         }
@@ -66,82 +81,143 @@ public class City implements IntValueReturnable {
     }
 
     public static ArrayListToSortByStrategy<City> loadDataFromFile(String pathToFile) {
-        ArrayListToSortByStrategy<City> cities = new ArrayListToSortByStrategy<>();
-        List<String> lines = null;
         try {
-            lines = Files.readAllLines(Paths.get(pathToFile));
+            return Files.lines(Paths.get(pathToFile))
+                    .map(line -> line.split(";"))
+                    .filter(parts -> parts.length == 4)
+                    // формат строки: name;latitude;longitude;foundationDate
+                    .map(parts -> {
+                        // формат строки: name;latitude;longitude;foundationDate
+                        String name = parts[0];
+                        double lat = Double.parseDouble(parts[1]);
+                        double lon = Double.parseDouble(parts[2]);
+                        String[] partsOfDate = parts[3].split("\\.");
+                        int day = Integer.parseInt(partsOfDate[0]);
+                        int month = Integer.parseInt(partsOfDate[1]);
+                        int year = Integer.parseInt(partsOfDate[2]);
+                        LocalDate date = LocalDate.of(year, month, day);
+                        return new City.Builder()
+                                .setName(name)
+                                .setLatitude(lat)
+                                .setLongitude(lon)
+                                .setFoundationDate(date)
+                                .build();
+                    })
+                    .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Ошибка чтения файла: " + e.getMessage());
+            return new ArrayListToSortByStrategy<>();
         }
-        for (String line : lines) {
-            try {
-                // формат строки: name;latitude;longitude;foundationDate
-                String[] parts = line.split(";");
-                if (parts.length == 4) {
-                    String name = parts[0];
-                    double lat = Double.parseDouble(parts[1]);
-                    double lon = Double.parseDouble(parts[2]);
-                    String[] partsOfDate = parts[3].split("\\.");
-                    int day = Integer.parseInt(partsOfDate[0]);
-                    int month = Integer.parseInt(partsOfDate[1]);
-                    int year = Integer.parseInt(partsOfDate[2]);
-                    LocalDate date = LocalDate.of(year, month, day);
-                    City city = new City.Builder()
-                            .setName(name)
-                            .setLatitude(lat)
-                            .setLongitude(lon)
-                            .setFoundationDate(date)
-                            .build();
-                    cities.add(city);
-                }
-            } catch (LocationException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-        return cities;
     }
 
     public static ArrayListToSortByStrategy<City> loadRandomData(int elementsQty) {
-        ArrayListToSortByStrategy<City> cities = new ArrayListToSortByStrategy<>();
         Faker faker = new Faker(new Locale("ru", "RU"));
-        for (int i = 0; i < elementsQty; i++) {
+        return IntStream.range(0, elementsQty)
+                .mapToObj(i -> {
+                    try {
+                        String name = faker.address().cityName();
+                        double lat = faker.number().randomDouble(6, -90, 90);
+                        double lon = faker.number().randomDouble(6, -180, 180);
+                        LocalDate date = LocalDate.of(
+                                faker.number().numberBetween(1000, 2023),
+                                faker.number().numberBetween(1, 12),
+                                faker.number().numberBetween(1, 28)
+                        );
+                        return new City.Builder()
+                                .setName(name)
+                                .setLatitude(lat)
+                                .setLongitude(lon)
+                                .setFoundationDate(date)
+                                .build();
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        return null;
+                    }
+                })
+                .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
+    }
+
+    public static String readCityName(Scanner scanner, String prompt) {
+        while(true) {
+            System.out.println(prompt);
+            String input = scanner.nextLine();
             try {
-                String name = faker.address().cityName();
-                double lat = faker.number().randomDouble(6, -90, 90);
-                double lon = faker.number().randomDouble(6, -180, 180);
-                LocalDate date = LocalDate.of(
-                        faker.number().numberBetween(1000, 2023),
-                        faker.number().numberBetween(1, 12),
-                        faker.number().numberBetween(1, 28)
-                );
-                City city = new City.Builder()
-                        .setName(name)
-                        .setLatitude(lat)
-                        .setLongitude(lon)
-                        .setFoundationDate(date)
-                        .build();
-                cities.add(city);
-            } catch (Exception e) {
+                if (input == null || input.trim().isEmpty()) {
+                    throw new IllegalArgumentException("Название города не может быть пустым");
+                }
+                if (!input.matches("[\\p{L} .'-]+")) {
+                    throw new IllegalArgumentException("Название города содержит недопустимые символы");
+                }
+                return input;
+            } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
         }
-        return cities;
+    }
+
+    public static double readLatitude(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.println(prompt);
+            String input = scanner.nextLine();
+            try {
+                double latitude = Double.parseDouble(input);
+                if (latitude < -90.0 || latitude > 90.0) {
+                    throw new IllegalArgumentException("Широта должна быть от -90 до 90 градусов");
+                }
+                return latitude;
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: нужно ввести число. Попробуйте снова.");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public static double readLongitude(Scanner scanner, String prompt) {
+        while (true) {
+            System.out.println(prompt);
+            String input = scanner.nextLine();
+            try {
+                double longitude = Double.parseDouble(input);
+                if (longitude < -180.0 || longitude > 180.0) {
+                    throw new IllegalArgumentException("Долготоа должна быть от -180 до 180 градусов");
+                }
+                return longitude;
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка: нужно ввести число. Попробуйте снова.");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public static LocalDate readDate(Scanner scanner, String prompt, String pattern) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+        while (true) {
+            System.out.println(prompt);
+            String input = scanner.nextLine();
+            try {
+                LocalDate foundationDate = LocalDate.parse(input, formatter);
+                if (foundationDate.isAfter(LocalDate.now())) {
+                    throw new IllegalArgumentException("Дата основания не может быть в будущем");
+                }
+                return foundationDate;
+            } catch (DateTimeParseException e) {
+                System.out.println("Ошибка: дата должна быть в формате " + pattern + ". Попробуйте снова.");
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
     public static City createObjectManually(Scanner scanner) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        String name = readCityName(scanner, "Введите название города:");
 
-        System.out.println("Введите название города:");
-        String name = scanner.nextLine();
+        double lat = readLatitude(scanner, "Введите широту (от -90 до 90 градусов):");
+        double lon = readLongitude(scanner, "Введите долготу (от -180 до 180 градусов):");
 
-        System.out.println("Введите широту (от -90 до 90 градусов):");
-        double lat = Double.parseDouble(scanner.nextLine());
+        LocalDate date = readDate(scanner, "Введите дату основания (dd.MM.yyyy):", "dd.MM.yyyy");
 
-        System.out.println("Введите долготу (от -180 до 180 градусов):");
-        double lon = Double.parseDouble(scanner.nextLine());
-
-        System.out.println("Введите дату основания (dd.MM.yyyy):");
-        LocalDate date = LocalDate.parse(scanner.nextLine(), formatter);
         try {
             City city = new City.Builder()
                     .setName(name)
@@ -150,29 +226,27 @@ public class City implements IntValueReturnable {
                     .setFoundationDate(date)
                     .build();
             return city;
-        } catch (LocationException e) {
+        } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             return null;
         }
     }
 
     public static ArrayListToSortByStrategy<City> loadDataManually(Scanner scanner)  {
-        ArrayListToSortByStrategy<City> cities = new ArrayListToSortByStrategy<>();
-
         System.out.println("Введите количество городов:");
-        int n = Integer.parseInt(scanner.nextLine());
+        int qty = Integer.parseInt(scanner.nextLine());
 
-        for (int i = 0; i < n; i++) {
-            try {
-                City city = createObjectManually(scanner);
-                cities.add(city);
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-        }
-
-
-        return cities;
+        return IntStream.range(0, qty)
+                .mapToObj(i -> {
+                    System.out.println("Город №" + (i + 1));
+                    try {
+                        return createObjectManually(scanner);
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                        return null;
+                    }
+                })
+                .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
     }
 
     public double getDistance(double latitude, double longitude) {
@@ -224,6 +298,75 @@ public class City implements IntValueReturnable {
                 Double.compare(longitude, other.longitude) == 0 &&
                 Objects.equals(name, other.name) &&
                 Objects.equals(foundationDate, other.foundationDate);
+    }
+
+    public static void main(String[] args) {
+        // Проверка валидности
+        // Создание города с пустым названием
+        try {
+            System.out.println(new City.Builder()
+                    .setName("")
+                    .setLatitude(10.0)
+                    .setLongitude(20.0)
+                    .setFoundationDate(LocalDate.of(1900, 12, 30)).build());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        // Создание города с недопустимым названием
+        try {
+            System.out.println(new City.Builder()
+                    .setName("Мо%сква")
+                    .setLatitude(10.0)
+                    .setLongitude(20.0)
+                    .setFoundationDate(LocalDate.of(1900, 12, 30)).build());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        // Создание города с недопустимой широтой
+        try {
+            System.out.println(new City.Builder()
+                    .setName("Москва")
+                    .setLatitude(200.0)
+                    .setLongitude(20.0)
+                    .setFoundationDate(LocalDate.of(1900, 12, 30)).build());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        // Создание города с недопустимой долготой
+        try {
+            System.out.println(new City.Builder()
+                    .setName("Москва")
+                    .setLatitude(20.0)
+                    .setLongitude(500.0)
+                    .setFoundationDate(LocalDate.of(1900, 12, 30)).build());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        // Создание города с недопустимой датой
+        try {
+            System.out.println(new City.Builder()
+                    .setName("Москва")
+                    .setLatitude(20.0)
+                    .setLongitude(50.0)
+                    .setFoundationDate(LocalDate.of(2500, 12, 30)).build());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        // Валидные данные
+        try {
+            System.out.println(new City.Builder()
+                    .setName("Москва")
+                    .setLatitude(20.0)
+                    .setLongitude(50.0)
+                    .setFoundationDate(LocalDate.of(800, 12, 30)).build());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
 

@@ -8,7 +8,10 @@ import java.util.Comparator;
 public class QuickSortStrategy<T> implements SortStrategy<T> {
     @Override
     public ArrayListToSortByStrategy<T> sort(ArrayListToSortByStrategy<T> array, Comparator<T> comparator) {
-        return quickSort(array, 0, array.size() - 1, comparator);
+        ArrayListToSortByStrategy list = new ArrayListToSortByStrategy();
+        list.addAll(array);
+        if (array.isEmpty()) return list;
+        else return quickSort(list, 0, array.size() - 1, comparator);
     }
 
     ArrayListToSortByStrategy<T> quickSort(ArrayListToSortByStrategy<T> array, int leftBorder, int rightBorder, Comparator<T> comparator) {

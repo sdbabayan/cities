@@ -137,7 +137,6 @@ public class Animal {
                     System.out.println("Животное №" + (i + 1));
                     System.out.print("Вид: ");
                     String kind = sc.nextLine();
-                    System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
                     Colours colour = null;
                     while (colour == null) {
                         System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
@@ -201,5 +200,40 @@ public class Animal {
                 .eyesColour(colour)
                 .isWoolen(wool)
                 .build();
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println("Working dir: " + System.getProperty("user.dir"));
+
+        try {
+            Animal a1 = new Animal.Builder()
+                    .kind("Dog").eyesColour(Colours.BLUE).isWoolen(true).build();
+            System.out.println("Валидный: " + a1);
+        } catch (Exception e) {
+            System.out.println("Ошибка создания валидного: " + e.getMessage());
+        }
+
+        try {
+            Animal a2 = new Animal.Builder()
+                    .eyesColour(Colours.GREEN).isWoolen(false).build();
+            System.out.println(a2);
+        } catch (Exception e) {
+            System.out.println("Ожидаемая ошибка (невалидный): " + e.getMessage());
+        }
+
+        ArrayListToSortByStrategy<Animal> fromFile =
+                Animal.loadDataFromFile("animals.txt");
+        System.out.println("Из файла:");
+        fromFile.forEach(System.out::println);
+
+        ArrayListToSortByStrategy<Animal> random =
+                Animal.loadRandomData(5);
+        System.out.println("Случайные данные:");
+        random.forEach(System.out::println);
+
+        //Ввод вручную
+        //ArrayListToSortByStrategy<Animal> manual = Animal.loadDataManually();
+        //manual.forEach(System.out::println);
     }
 }

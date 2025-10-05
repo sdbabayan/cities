@@ -1,7 +1,7 @@
 package data.repository;
 
-import domain.interfaces.SortStrategy;
 import domain.interfaces.SearchStrategy;
+import domain.interfaces.SortStrategy;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,11 +16,15 @@ public class ArrayListToSortByStrategy<T> extends ArrayList<T> {
         super(c);
     }
 
-    public ArrayListToSortByStrategy<T> sortByStrategy(SortStrategy sortStrategy, Comparator<T> comparator){
-        return sortStrategy.sort(this, comparator);
+    public ArrayListToSortByStrategy<T> sortByStrategy(SortStrategy<T> sortStrategy, Comparator<T> comparator) {
+        ArrayListToSortByStrategy<T> sorted = sortStrategy.sort(this, comparator);
+        ArrayListToSortByStrategy<T> sortedCopy = new ArrayListToSortByStrategy<>(sorted);
+        this.clear();
+        this.addAll(sortedCopy);
+        return this;
     }
 
-    public boolean searchByStrategy(SearchStrategy searchStrategy, T keyObject, Comparator<T> comparator) {
-        return searchStrategy.search(this, keyObject, comparator);
-    }    
+    public T searchByStrategy(SearchStrategy searchStrategy, T keyObject, Comparator<T> comparator) {
+        return (T) searchStrategy.search(this, keyObject, comparator);
+    }
 }
