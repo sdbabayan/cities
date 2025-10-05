@@ -1,3 +1,5 @@
+package search;
+
 import data.repository.ArrayListToSortByStrategy;
 import domain.search.BinarySearchStrategy;
 import org.junit.jupiter.api.BeforeEach;

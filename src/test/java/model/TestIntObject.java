@@ -10,6 +10,10 @@ public class TestIntObject implements IntValueReturnable {
         this.value = value;
         this.name = name;
     }
+    public TestIntObject(String name, int value) {
+        this.value = value;
+        this.name = name;
+    }
 
     @Override
     public int getIntValue() {
