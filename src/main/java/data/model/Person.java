@@ -298,7 +298,7 @@ public class Person implements IntValueReturnable {
             System.err.println("Ошибка записи в файл: " + e.getMessage());
         }
     }
-
+    /*
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("=== ТЕСТИРОВАНИЕ КЛАССА PERSON ===\n");
@@ -458,4 +458,5 @@ public class Person implements IntValueReturnable {
         System.out.println("\n=== ТЕСТИРОВАНИЕ ЗАВЕРШЕНО ===");
         scanner.close();
     }
+    */
 }
