@@ -1,32 +1,39 @@
+package sort;
+
 import data.repository.ArrayListToSortByStrategy;
-import domain.sort.QuickSortStrategy;
+import domain.sort.MergeSortStrategy;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
+import org.junit.jupiter.api.AfterEach;
 import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class QuickSortStrategyTest {
+class MergeSortStrategyTest {
 
-    private QuickSortStrategy<Integer> quickSortStrategy;
+    private MergeSortStrategy<Integer> mergeSortStrategy;
     private Comparator<Integer> integerComparator;
     private ArrayListToSortByStrategy<Integer> listToSort;
 
     @BeforeEach
     void setUp() {
-        quickSortStrategy = new QuickSortStrategy<>();
+        mergeSortStrategy = new MergeSortStrategy<>();
         integerComparator = Comparator.naturalOrder();
         listToSort = new ArrayListToSortByStrategy<>();
+    }
+
+    @AfterEach
+    void tearDown() {
+        mergeSortStrategy.shutdown();
     }
 
     @Test
     @DisplayName("Should sort empty list")
     void shouldSortEmptyList() {
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertTrue(result.isEmpty());
@@ -41,7 +48,7 @@ class QuickSortStrategyTest {
         ArrayListToSortByStrategy<Integer> expected = new ArrayListToSortByStrategy<>(List.of(42));
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertEquals(1, result.size());
@@ -64,7 +71,7 @@ class QuickSortStrategyTest {
         );
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertEquals(expected, result);
@@ -85,7 +92,7 @@ class QuickSortStrategyTest {
         );
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertEquals(expected, result);
@@ -108,7 +115,7 @@ class QuickSortStrategyTest {
         );
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertEquals(expected, result);
@@ -130,7 +137,7 @@ class QuickSortStrategyTest {
         );
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertEquals(expected, result);
@@ -152,7 +159,7 @@ class QuickSortStrategyTest {
         );
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, reverseComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, reverseComparator);
 
         // Then
         assertEquals(expected, result);
@@ -173,7 +180,7 @@ class QuickSortStrategyTest {
         );
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertEquals(expected, result);
@@ -195,7 +202,7 @@ class QuickSortStrategyTest {
         );
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertEquals(expected, result);
@@ -211,7 +218,7 @@ class QuickSortStrategyTest {
         ArrayListToSortByStrategy<Integer> originalCopy = new ArrayListToSortByStrategy<>(listToSort);
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertNotSame(listToSort, result, "Should return new instance");
@@ -234,7 +241,7 @@ class QuickSortStrategyTest {
         int originalListSize = listToSort.size();
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertEquals(originalSize, result.size());
@@ -250,7 +257,7 @@ class QuickSortStrategyTest {
         }
 
         // When
-        ArrayListToSortByStrategy<Integer> result = quickSortStrategy.sort(listToSort, integerComparator);
+        ArrayListToSortByStrategy<Integer> result = mergeSortStrategy.sort(listToSort, integerComparator);
 
         // Then
         assertEquals(1000, result.size());
