@@ -233,8 +233,21 @@ public class City implements IntValueReturnable {
     }
 
     public static ArrayListToSortByStrategy<City> loadDataManually(Scanner scanner)  {
-        System.out.println("Введите количество городов:");
-        int qty = Integer.parseInt(scanner.nextLine());
+        int qty;
+        while(true) {
+            System.out.println("Введите количество городов: ");
+            String qtyInput = scanner.nextLine().trim();
+            try {
+                qty = Integer.parseInt(qtyInput);
+                if (qty <= 0){
+                    System.out.println("Введите значение больше нуля.");
+                    continue;
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Неверный формат ввода. Укажите положительное число.");
+            }
+        }
 
         return IntStream.range(0, qty)
                 .mapToObj(i -> {
