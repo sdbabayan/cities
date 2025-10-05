@@ -115,38 +115,85 @@ public class Animal {
 
     public static ArrayListToSortByStrategy<Animal> loadDataManually() {
         Scanner sc = new Scanner(System.in);
-        System.out.print("Сколько животных добавить? ");
-        int qty = Integer.parseInt(sc.nextLine());
-            return IntStream.range(0, qty)
-                    .mapToObj(i -> {
-                        System.out.println("Животное №" + (i + 1));
-                        System.out.print("Вид: ");
-                        String kind = sc.nextLine();
-                        Colours colour = null;
-                        while (colour == null) {
-                            System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
-                            String input = sc.nextLine().trim().toUpperCase();
-                            try {
-                                colour = Colours.valueOf(input);
-                            } catch (IllegalArgumentException e) {
-                                System.out.println("Некорректный цвет. Допустимые значения: BROWN, GREEN, BLUE, GRAY.");
-                            }
+        int qty;
+
+        while(true) {
+            System.out.print("Сколько животных добавить? ");
+            String qtyInput = sc.nextLine().trim();
+            try {
+                qty = Integer.parseInt(qtyInput);
+                if (qty <= 0){
+                    System.out.println("Введите значение больше нуля.");
+                    continue;
+                }
+                break;
+            } catch (NumberFormatException e) {
+                System.out.println("Неверный формат ввода. Укажите положительное число.");
+            }
+        }
+
+        return IntStream.range(0, qty)
+                .mapToObj(i -> {
+                    System.out.println("Животное №" + (i + 1));
+                    System.out.print("Вид: ");
+                    String kind = sc.nextLine();
+                    Colours colour = null;
+                    while (colour == null) {
+                        System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
+                        String input = sc.nextLine().trim().toUpperCase();
+                        try {
+                            colour = Colours.valueOf(input);
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Некорректный цвет. Допустимые значения: BROWN, GREEN, BLUE, GRAY.");
                         }
+                    }
+
+                    Boolean wool = null;
+                    while (wool == null) {
                         System.out.print("Есть шерсть? (true/false): ");
-                        boolean wool = Boolean.parseBoolean(sc.nextLine());
-                        return new Animal.Builder().kind(kind).eyesColour(colour).isWoolen(wool).build();
-                    })
-                    .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
+                        String woolInput = sc.nextLine().trim().toLowerCase();
+                        if (woolInput.equals("true") || woolInput.equals("false")) {
+                            wool = Boolean.parseBoolean(woolInput);
+                        } else {
+                            System.out.println("Введите 'true' или 'false'.");
+                        }
+                    }
+                    return new Animal.Builder().kind(kind).eyesColour(colour).isWoolen(wool).build();
+                })
+                .collect(Collectors.toCollection(ArrayListToSortByStrategy::new));
         }
 
     public static Animal createObjectManually(Scanner sc) {
         System.out.println("Введите данные животного:");
-        System.out.print("Вид: ");
-        String kind = sc.nextLine();
-        System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
-        Colours colour = Colours.valueOf(sc.nextLine().trim().toUpperCase());
-        System.out.print("Есть шерсть? (true/false): ");
-        boolean wool = Boolean.parseBoolean(sc.nextLine());
+        String kind;
+        while(true) {
+            System.out.print("Вид: ");
+            kind = sc.nextLine().trim();
+            if(!kind.isEmpty()) break;
+            System.out.println("Вид не можеть быть пустым.");
+        }
+
+        Colours colour = null;
+        while (colour == null) {
+            System.out.print("Цвет глаз (BROWN/GREEN/BLUE/GRAY): ");
+            String input = sc.nextLine().trim().toUpperCase();
+            try {
+                colour = Colours.valueOf(input);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Некорректный цвет. Допустимые значения: BROWN, GREEN, BLUE, GRAY.");
+            }
+        }
+
+        Boolean wool = null;
+        while (wool == null) {
+            System.out.print("Есть шерсть? (true/false): ");
+            String inputWool = sc.nextLine().trim().toLowerCase();
+            if (inputWool.equals("true") || inputWool.equals("false")) {
+                wool = Boolean.parseBoolean(inputWool);
+            } else {
+                System.out.println("Введите 'true' или 'false'.");
+            }
+        }
 
         return new Animal.Builder()
                 .kind(kind)
