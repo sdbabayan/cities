@@ -1,1 +1,26 @@
-Dog;BLUE;true
+dog;BLUE;true
+cockroach;GREEN;false
+mammoth;BLUE;false
+minnow;GREEN;false
+cricket;BROWN;true
+rhinoceros;BLUE;false
+ape;BLUE;true
+macaw;BLUE;false
+grasshopper;BLUE;true
+koala;GRAY;false
+guinea pig;GRAY;false
+goat;BROWN;false
+buffalo;GRAY;true
+termite;BLUE;false
+porcupine;BLUE;false
+antelope;GREEN;false
+muskrat;GRAY;false
+raccoon;GRAY;false
+crab;BROWN;false
+worm;BLUE;false
+wildebeest;BLUE;false
+eagle;BLUE;false
+macaw;BROWN;true
+ant;BLUE;true
+hound;GRAY;true
+cat;GREEN;true
