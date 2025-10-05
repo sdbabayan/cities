@@ -20,7 +20,7 @@ public class ArrayListToSortByStrategy<T> extends ArrayList<T> {
         return sortStrategy.sort(this, comparator);
     }
 
-    public boolean searchByStrategy(SearchStrategy searchStrategy, T keyObject, Comparator<T> comparator) {
-        return searchStrategy.search(this, keyObject, comparator);
+    public T searchByStrategy(SearchStrategy searchStrategy, T keyObject, Comparator<T> comparator) {
+        return (T) searchStrategy.search(this, keyObject, comparator);
     }    
 }
