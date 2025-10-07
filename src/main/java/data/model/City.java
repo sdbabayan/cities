@@ -299,7 +299,7 @@ public class City implements IntValueReturnable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, latitude, longitude, foundationDate);
+        return Objects.hash(name, Math.round(latitude * 1e6), Math.round(longitude * 1e6), foundationDate);
     }
 
     @Override
@@ -307,8 +307,8 @@ public class City implements IntValueReturnable {
         if (this == obj) return true;
         if (!(obj instanceof City)) return false;
         City other = (City) obj;
-        return Double.compare(latitude, other.latitude) == 0 &&
-                Double.compare(longitude, other.longitude) == 0 &&
+        return Double.compare(Math.round(latitude * 1e6), Math.round(other.latitude * 1e6)) == 0 &&
+                Double.compare(Math.round(longitude * 1e6), Math.round(other.longitude * 1e6)) == 0 &&
                 Objects.equals(name, other.name) &&
                 Objects.equals(foundationDate, other.foundationDate);
     }
